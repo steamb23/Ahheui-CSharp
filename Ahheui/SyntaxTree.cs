@@ -19,9 +19,9 @@ namespace SteamB23.Ahheui
             this.move = move;
             this.index = index;
         }
-        Command command;
-        Move move;
-        Index index;
+        public Command command;
+        public Move move;
+        public Index index;
         public enum Command
         {
             None,
