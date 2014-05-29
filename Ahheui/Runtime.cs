@@ -7,10 +7,16 @@ namespace SteamB23.Ahheui
 {
     public class Runtime
     {
-        public static System.Diagnostics.Stopwatch workElapsed; 
-        public Runtime(String code)
+        Parser parser;
+        Cursor cursor;
+        public Runtime(String script)
         {
+            this.parser = new Parser(script);
         }
-        
+    }
+    public struct Cursor
+    {
+        int i;
+        int j;
     }
 }

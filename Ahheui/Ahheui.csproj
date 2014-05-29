@@ -7,7 +7,7 @@
     <ProjectGuid>{06BD8A0E-844F-4651-A1E5-2E60044137A0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ahheui</RootNamespace>
+    <RootNamespace>SteamB23.Ahheui</RootNamespace>
     <AssemblyName>Ahheui</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
