@@ -11,9 +11,9 @@ namespace SteamB23.Ahheui
     /// <remarks>
     /// 워낙에 간단한 구조의 언어이기 때문에 이런 형태를 띕니다.
     /// </remarks>
-    public struct SyntaxTree
+    public struct Syntax
     {
-        public SyntaxTree(Command command, Move move, Index index)
+        public Syntax(Command command, Move move, Index index)
         {
             this.command = command;
             this.move = move;

@@ -11,21 +11,21 @@ namespace Ahheui_Test
         public void WordAnalyzer()
         {
             PrivateObject parser = new PrivateObject(new Parser(""));
-            SyntaxTree test = (SyntaxTree)parser.Invoke("WordAnalyzer", '고');
+            Syntax test = (Syntax)parser.Invoke("WordAnalyzer", '고');
 
             // 방향 판별 검사
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.Up, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '고'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.Down, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '구'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.Right, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '가'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.Left, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '거'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.UpJump, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '교'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.DownJump, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '규'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.RightJump, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '갸'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Goto, SyntaxTree.Move.LeftJump, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '겨'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.Up, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '고'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.Down, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '구'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.Right, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '가'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.Left, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '거'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.UpJump, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '교'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.DownJump, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '규'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.RightJump, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '갸'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Goto, Syntax.Move.LeftJump, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '겨'));
             // 상황 검사
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Return, SyntaxTree.Move.None, SyntaxTree.Index._), (SyntaxTree)parser.Invoke("WordAnalyzer", '관'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Division, SyntaxTree.Move.Right, SyntaxTree.Index.ㄴ), (SyntaxTree)parser.Invoke("WordAnalyzer", '난'));
-            Assert.AreEqual<SyntaxTree>(new SyntaxTree(SyntaxTree.Command.Move, SyntaxTree.Move.Right, SyntaxTree.Index.ㅅ), (SyntaxTree)parser.Invoke("WordAnalyzer", '쌋'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Return, Syntax.Move.None, Syntax.Index._), (Syntax)parser.Invoke("WordAnalyzer", '관'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Division, Syntax.Move.Right, Syntax.Index.ㄴ), (Syntax)parser.Invoke("WordAnalyzer", '난'));
+            Assert.AreEqual<Syntax>(new Syntax(Syntax.Command.Move, Syntax.Move.Right, Syntax.Index.ㅅ), (Syntax)parser.Invoke("WordAnalyzer", '쌋'));
         }
         /// <summary>
         /// Parser의 생성자에 기존에 돌아다니던 Hello, world!예제 프로그램을 매개변수로 넣어서 무슨결과가 나왔는지 보는 테스트입니다.

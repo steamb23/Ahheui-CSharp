@@ -8,31 +8,31 @@ namespace SteamB23.Ahheui
 {
     public class Parser
     {
-        char[,] words;
-        SyntaxTree[,] ast;
-        public char[,] Words
+        char[,] wordField;
+        Syntax[,] syntaxField;
+        public char[,] WordField
         {
             get
             {
-                return words;
+                return wordField;
             }
         }
-        public SyntaxTree[,] Ast
+        public Syntax[,] SyntaxField
         {
             get
             {
-                return ast;
+                return syntaxField;
             }
         }
         public Parser(string script)
         {
-            words = ScriptCutter(script);
-            ast = new SyntaxTree[words.GetLength(0), words.GetLength(1)];
-            for (int i = 0; i < words.GetLength(0); i++)
+            wordField = ScriptCutter(script);
+            syntaxField = new Syntax[wordField.GetLength(0), wordField.GetLength(1)];
+            for (int i = 0; i < wordField.GetLength(0); i++)
             {
-                for (int j = 0; j < words.GetLength(1); j++)
+                for (int j = 0; j < wordField.GetLength(1); j++)
                 {
-                    ast[i, j] = WordAnalyzer(words[i, j]);
+                    syntaxField[i, j] = WordAnalyzer(wordField[i, j]);
                 }
             }
         }
@@ -41,7 +41,7 @@ namespace SteamB23.Ahheui
         {
             string[] lineSplits = script.Split('\n');
             // totalLength를 구해서 완성된 리스트를 만들기전에 임시로 저장해둘 큐
-            List<char[]> wordsList = new List<char[]>();
+            List<char[]> words = new List<char[]>();
 
             int totalLength = 0;
             foreach (var lineSplit in lineSplits)
@@ -49,7 +49,7 @@ namespace SteamB23.Ahheui
                 var word = lineSplit.ToCharArray();
                 if (totalLength < word.Length)
                     totalLength = word.Length;
-                wordsList.Add(word);
+                words.Add(word);
             }
             // 배열 재조립
             char[,] result = new char[lineSplits.Count(), totalLength];
@@ -57,15 +57,15 @@ namespace SteamB23.Ahheui
             {
                 for (int j = 0; j < totalLength; j++)
                 {
-                    result[i, j] = wordsList[i][j];
+                    result[i, j] = words[i][j];
                 }
             }
             return result;
         }
-        public SyntaxTree WordAnalyzer(char word)
+        public Syntax WordAnalyzer(char word)
         {
 
-            SyntaxTree result = CreateSyntaxTree(SyntaxTree.Command.None, -1, 0);
+            Syntax result = CreateSyntaxTree(Syntax.Command.None, -1, 0);
             if (word >= 0xac00 && word <= 0xD79F)
             {
 
@@ -83,75 +83,75 @@ namespace SteamB23.Ahheui
                 switch (firstChar)
                 {
                     default:
-                        result = CreateSyntaxTree(SyntaxTree.Command.None, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.None, middleChar, 0);
                         break;
                     case 0:  // ㄱ          Goto와 Return의 구분이 필요함!
-                        if (SyntaxTree.Move.None != ToMoveCommand(middleChar))
-                            result = CreateSyntaxTree(SyntaxTree.Command.Goto, middleChar, lastChar);
+                        if (Syntax.Move.None != ToMoveCommand(middleChar))
+                            result = CreateSyntaxTree(Syntax.Command.Goto, middleChar, lastChar);
                         else
-                            result = CreateSyntaxTree(SyntaxTree.Command.Return, -1, 0);
+                            result = CreateSyntaxTree(Syntax.Command.Return, -1, 0);
                         break;
                     case 2:  // ㄴ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Division, middleChar, lastChar);
+                        result = CreateSyntaxTree(Syntax.Command.Division, middleChar, lastChar);
                         break;
                     case 3:  // ㄷ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Addition, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Addition, middleChar, 0);
                         break;
                     case 4:  // ㄸ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Multiplication, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Multiplication, middleChar, 0);
                         break;
                     case 5:  // ㄹ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Remainder, middleChar, lastChar);
+                        result = CreateSyntaxTree(Syntax.Command.Remainder, middleChar, lastChar);
                         break;
                     case 6:  // ㅁ
                         if (lastChar == 11)
-                            result = CreateSyntaxTree(SyntaxTree.Command.Output, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.Output, middleChar, lastChar);
                         else if (lastChar == 18)
-                            result = CreateSyntaxTree(SyntaxTree.Command.OutputChar, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.OutputChar, middleChar, lastChar);
                         else
-                            result = CreateSyntaxTree(SyntaxTree.Command.Pop, middleChar, 0);
+                            result = CreateSyntaxTree(Syntax.Command.Pop, middleChar, 0);
                         break;
                     case 7:  // ㅂ
                         if (lastChar == 11)
-                            result = CreateSyntaxTree(SyntaxTree.Command.Input, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.Input, middleChar, lastChar);
                         else if (lastChar == 18)
-                            result = CreateSyntaxTree(SyntaxTree.Command.InputChar, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.InputChar, middleChar, lastChar);
                         else
-                            result = CreateSyntaxTree(SyntaxTree.Command.Push, middleChar, 0);
+                            result = CreateSyntaxTree(Syntax.Command.Push, middleChar, 0);
                         break;
                     case 8:  // ㅃ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Clone, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Clone, middleChar, 0);
                         break;
                     case 9:  // ㅅ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Pick, middleChar, lastChar);
+                        result = CreateSyntaxTree(Syntax.Command.Pick, middleChar, lastChar);
                         break;
                     case 10: // ㅆ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Move, middleChar, lastChar);
+                        result = CreateSyntaxTree(Syntax.Command.Move, middleChar, lastChar);
                         break;
                     case 11: // ㅇ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Nothing, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Nothing, middleChar, 0);
                         break;
                     case 12: // ㅈ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Compare, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Compare, middleChar, 0);
                         break;
                     case 14: // ㅊ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Condition, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Condition, middleChar, 0);
                         break;
                     case 16: // ㅌ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Subtraction, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Subtraction, middleChar, 0);
                         break;
                     case 17: // ㅍ
-                        result = CreateSyntaxTree(SyntaxTree.Command.Switch, middleChar, 0);
+                        result = CreateSyntaxTree(Syntax.Command.Switch, middleChar, 0);
                         break;
                     case 18: // ㅎ
-                        result = CreateSyntaxTree(SyntaxTree.Command.End, -1, 0);
+                        result = CreateSyntaxTree(Syntax.Command.End, -1, 0);
                         break;
                 }
                 #endregion
             }
             return result;
         }
-        SyntaxTree.Move ToMoveCommand(int jungseong)
+        Syntax.Move ToMoveCommand(int jungseong)
         {
             byte reservedWord;
             for (int i = 0; i < ReservedWord.move.Length; i++)
@@ -159,14 +159,14 @@ namespace SteamB23.Ahheui
                 reservedWord = ReservedWord.move[i];
                 if (jungseong == reservedWord)
                 {
-                    return (SyntaxTree.Move)jungseong;
+                    return (Syntax.Move)jungseong;
                 }
             }
-            return SyntaxTree.Move.None;
+            return Syntax.Move.None;
         }
-        SyntaxTree CreateSyntaxTree(SyntaxTree.Command command, int jungseong, int jongseong)
+        Syntax CreateSyntaxTree(Syntax.Command command, int jungseong, int jongseong)
         {
-            return new SyntaxTree(command, ToMoveCommand(jungseong), (SyntaxTree.Index)jongseong);
+            return new Syntax(command, ToMoveCommand(jungseong), (Syntax.Index)jongseong);
         }
     }
 
