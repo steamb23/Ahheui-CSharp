@@ -25,7 +25,72 @@ namespace SteamB23.Ahheui
         {
             get
             {
-                return parser.Words[cursor.i, cursor.j];
+                return parser.WordField[cursor.i, cursor.j];
+            }
+        }
+        public Syntax CurrentSyntax
+        {
+            get
+            {
+                return parser.SyntaxField[cursor.i, cursor.j];
+            }
+        }
+        public void CheckAwayCursor()
+        {
+            if (cursor.i < 0)
+                cursor.i = parser.SyntaxField.GetLength(0);
+            if (cursor.i >= parser.SyntaxField.GetLength(0))
+                cursor.i = 0;
+
+            if (cursor.j < 0)
+                cursor.j = parser.SyntaxField.GetLength(1);
+            if (cursor.j >= parser.SyntaxField.GetLength(1))
+                cursor.j = 0;
+        }
+        void CursorMove()
+        {
+            switch (CurrentSyntax.move)
+            {
+                case Syntax.Move.Up:
+                    cursor.i--;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.Down:
+                    cursor.i++;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.Right:
+                    cursor.j++;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.Left:
+                    cursor.j--;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.UpJump:
+                    cursor.i--;
+                    CheckAwayCursor();
+                    cursor.i--;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.DownJump:
+                    cursor.i++;
+                    CheckAwayCursor();
+                    cursor.i++;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.RightJump:
+                    cursor.j++;
+                    CheckAwayCursor();
+                    cursor.j++;
+                    CheckAwayCursor();
+                    break;
+                case Syntax.Move.LeftJump:
+                    cursor.j--;
+                    CheckAwayCursor();
+                    cursor.j--;
+                    CheckAwayCursor();
+                    break;
             }
         }
     }
