@@ -151,22 +151,39 @@ namespace SteamB23.Ahheui
             }
             return result;
         }
-        Syntax.Move ToMoveCommand(int jungseong)
+        Syntax.Move ToMoveCommand(int middleChar)
         {
             byte reservedWord;
             for (int i = 0; i < ReservedWord.move.Length; i++)
             {
                 reservedWord = ReservedWord.move[i];
-                if (jungseong == reservedWord)
+                if (middleChar == reservedWord)
                 {
-                    return (Syntax.Move)jungseong;
+                    return (Syntax.Move)middleChar;
                 }
             }
             return Syntax.Move.None;
         }
-        Syntax CreateSyntaxTree(Syntax.Command command, int jungseong, int jongseong)
+        Syntax.Index ToIndex(int lastChar)
         {
-            return new Syntax(command, ToMoveCommand(jungseong), (Syntax.Index)jongseong);
+            if (lastChar > 20)
+            {
+                switch (lastChar)
+                {
+                    case 21:
+                        return Syntax.Index.ㅇ;
+                    case 27:
+                        return Syntax.Index.ㅎ;
+                    default:
+                        return (Syntax.Index)(lastChar - 1);
+                }
+            }
+            else
+                return (Syntax.Index)lastChar;
+        }
+        Syntax CreateSyntaxTree(Syntax.Command command, int middleChar, int lastChar)
+        {
+            return new Syntax(command, ToMoveCommand(middleChar), (Syntax.Index)lastChar);
         }
     }
 
