@@ -105,17 +105,17 @@ namespace SteamB23.Ahheui
                         break;
                     case 6:  // ㅁ
                         if (lastChar == 11)
-                            result = CreateSyntaxTree(Syntax.Command.Output, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.Output, middleChar, 0);
                         else if (lastChar == 18)
-                            result = CreateSyntaxTree(Syntax.Command.OutputChar, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.OutputChar, middleChar, 0);
                         else
                             result = CreateSyntaxTree(Syntax.Command.Pop, middleChar, 0);
                         break;
                     case 7:  // ㅂ
                         if (lastChar == 11)
-                            result = CreateSyntaxTree(Syntax.Command.Input, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.Input, middleChar, 0);
                         else if (lastChar == 18)
-                            result = CreateSyntaxTree(Syntax.Command.InputChar, middleChar, lastChar);
+                            result = CreateSyntaxTree(Syntax.Command.InputChar, middleChar, 0);
                         else
                             result = CreateSyntaxTree(Syntax.Command.Push, middleChar, 0);
                         break;
