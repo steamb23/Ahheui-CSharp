@@ -14,11 +14,12 @@ namespace SteamB23.Ahheui
         Stack<int>[] stacks;
         Queue<int> queue;
         int StoragePointer;
+        Stack<Cursor> PreviousCursor;
         bool isEnd;
 
         public Runtime(String script)
         {
-            this.cursor = new Cursor(0, 0);
+            this.cursor = new Cursor(0, 0, parser);
             this.stacks = new Stack<int>[27];
             for (int i = 0; i < stacks.Length; i++)
             {
@@ -27,6 +28,7 @@ namespace SteamB23.Ahheui
             this.queue = new Queue<int>();
             this.parser = new Parser(script);
             this.StoragePointer = 0;
+            this.PreviousCursor = new Stack<Cursor>();
         }
         public Cursor Cursor
         {
@@ -49,61 +51,37 @@ namespace SteamB23.Ahheui
                 return parser.SyntaxField[cursor.i, cursor.j];
             }
         }
-        public void CheckAwayCursor()
-        {
-            if (cursor.i < 0)
-                cursor.i = parser.SyntaxField.GetLength(0);
-            if (cursor.i >= parser.SyntaxField.GetLength(0))
-                cursor.i = 0;
-
-            if (cursor.j < 0)
-                cursor.j = parser.SyntaxField.GetLength(1);
-            if (cursor.j >= parser.SyntaxField.GetLength(1))
-                cursor.j = 0;
-        }
         void CursorMove()
         {
             switch (CurrentSyntax.move)
             {
                 case Syntax.Move.Up:
                     cursor.i--;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.Down:
                     cursor.i++;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.Right:
                     cursor.j++;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.Left:
                     cursor.j--;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.UpJump:
                     cursor.i--;
-                    CheckAwayCursor();
                     cursor.i--;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.DownJump:
                     cursor.i++;
-                    CheckAwayCursor();
                     cursor.i++;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.RightJump:
                     cursor.j++;
-                    CheckAwayCursor();
                     cursor.j++;
-                    CheckAwayCursor();
                     break;
                 case Syntax.Move.LeftJump:
                     cursor.j--;
-                    CheckAwayCursor();
                     cursor.j--;
-                    CheckAwayCursor();
                     break;
             }
         }
@@ -175,14 +153,41 @@ namespace SteamB23.Ahheui
             }
         }
     }
-    public struct Cursor
+    public class Cursor
     {
-        public Cursor(int i, int j)
+        // C#의 신이시어 프로퍼티를 대문자로 표기하지 않은 저를 용서하소서.
+        Parser parser;
+        public Cursor(int i, int j, Parser parser)
         {
-            this.i = i;
-            this.j = j;
+            this._i = i;
+            this._j = j;
+            this.parser = parser;
         }
-        public int i;
-        public int j;
+        int _i;
+        int _j;
+        public int i
+        {
+            get
+            {
+                return _i;
+            }
+            set
+            {
+                _i = (value < 0) ? parser.SyntaxField.GetLength(0) : value;
+                _i = (value >= parser.SyntaxField.GetLength(0)) ? 0 : value;
+            }
+        }
+        public int j
+        {
+            get
+            {
+                return _j;
+            }
+            set
+            {
+                _j = (value < 0) ? parser.SyntaxField.GetLength(1) : value;
+                _j = (value >= parser.SyntaxField.GetLength(1)) ? 0 : value;
+            }
+        }
     }
 }
