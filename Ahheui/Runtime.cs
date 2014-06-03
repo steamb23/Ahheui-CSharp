@@ -153,7 +153,7 @@ namespace SteamB23.Ahheui
             }
         }
     }
-    public class Cursor
+    public class Cursor : ICloneable
     {
         // C#의 신이시어 프로퍼티를 대문자로 표기하지 않은 저를 용서하소서.
         Parser parser;
@@ -188,6 +188,10 @@ namespace SteamB23.Ahheui
                 _j = (value < 0) ? parser.SyntaxField.GetLength(1) : value;
                 _j = (value >= parser.SyntaxField.GetLength(1)) ? 0 : value;
             }
+        }
+        public object Clone()
+        {
+            return new Cursor(i, j, parser);
         }
     }
 }
