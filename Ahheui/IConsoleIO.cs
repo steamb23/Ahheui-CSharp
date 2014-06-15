@@ -5,9 +5,9 @@ using System.Text;
 
 namespace SteamB23.Ahheui
 {
-    public interface IApplication
+    public interface IConsoleIO
     {
         void Output(string output);
-        void Input(string input);
+        string Input();
     }
 }
