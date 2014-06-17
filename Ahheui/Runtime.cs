@@ -13,7 +13,7 @@ namespace SteamB23.Ahheui
         Cursor cursor;
         Stack<double>[] stacks;
         Queue<double> queue;
-        int StoragePointer;
+        int storagePointer;
         Stack<Cursor> PreviousCursor;
         bool isEnd;
 
@@ -27,7 +27,7 @@ namespace SteamB23.Ahheui
             }
             this.queue = new Queue<double>();
             this.parser = new Parser(script);
-            this.StoragePointer = 0;
+            this.storagePointer = 0;
             this.PreviousCursor = new Stack<Cursor>();
         }
         public Cursor Cursor
@@ -108,7 +108,7 @@ namespace SteamB23.Ahheui
                 case Syntax.Command.Remainder:
                     try
                     {
-                        DoublePopWork(ref stacks[StoragePointer], CurrentSyntax.command);
+                        DoublePopWork(ref stacks[storagePointer], CurrentSyntax.command);
                     }
                     catch (DivideByZeroException)
                     {
@@ -116,29 +116,38 @@ namespace SteamB23.Ahheui
                     }
                     break;
                 case Syntax.Command.Pop:
-                    stacks[StoragePointer].Pop();
+                    stacks[storagePointer].Pop();
                     break;
                 case Syntax.Command.Output:
-                    app.Output(stacks[StoragePointer].Pop().ToString());
+                    app.Output(stacks[storagePointer].Pop().ToString());
                     break;
                 case Syntax.Command.OutputChar:
-                    app.Output(((char)stacks[StoragePointer].Pop()).ToString());
+                    app.Output(((char)stacks[storagePointer].Pop()).ToString());
                     break;
                 case Syntax.Command.Push:
-                    stacks[StoragePointer].Push(GetRawValue(CurrentSyntax.index));
+                    stacks[storagePointer].Push(GetRawValue(CurrentSyntax.index));
                     break;
                 case Syntax.Command.Input:
-                    stacks[StoragePointer].Push(double.Parse(app.Input()));
+                    stacks[storagePointer].Push(double.Parse(app.Input()));
                     break;
                 case Syntax.Command.InputChar:
-                    stacks[StoragePointer].Push(char.Parse(app.Input()));
+                    stacks[storagePointer].Push(char.Parse(app.Input()));
                     break;
                 case Syntax.Command.Clone:
-                    stacks[StoragePointer].Push(stacks[StoragePointer].Peek());
+                    stacks[storagePointer].Push(stacks[storagePointer].Peek());
                     break;
                 case Syntax.Command.Switch:
-                    DoublePopWork(ref stacks[StoragePointer], Syntax.Command.Switch);
+                    DoublePopWork(ref stacks[storagePointer], Syntax.Command.Switch);
                     break;
+                case Syntax.Command.Pick:
+                    storagePointer = (int)CurrentSyntax.index;
+                    break;
+                case Syntax.Command.Move:
+                    double temp = stacks[storagePointer].Pop();
+                    stacks[(int)CurrentSyntax.index].Push(temp);
+                    break;
+
+                    
             }
         }
         static void DoublePopWork(ref Stack<double> stack, Syntax.Command command)
@@ -168,7 +177,7 @@ namespace SteamB23.Ahheui
                     break;
             }
         }
-        public static double GetRawValue(Syntax.Index index)
+        static double GetRawValue(Syntax.Index index)
         {
             switch (index)
             {
