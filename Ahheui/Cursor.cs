@@ -42,6 +42,11 @@ namespace SteamB23.Ahheui
                 _j = (value >= parser.SyntaxField.GetLength(1)) ? 0 : value;
             }
         }
+        public void Clear()
+        {
+            _i = 0;
+            _j = 0;
+        }
         public object Clone()
         {
             return new Cursor(i, j, parser);

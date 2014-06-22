@@ -2,33 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using SteamB23.Ahheui.Storages;
 
 namespace SteamB23.Ahheui
 {
     public class Runtime
     {
-        IConsoleIO app;
+        IConsole console;
 
         Parser parser;
         Cursor cursor;
-        Stack<double>[] stacks;
-        Queue<double> queue;
+        Storage storage;
         int storagePointer;
         Stack<Cursor> PreviousCursor;
         bool isEnd;
+        bool isRun;
 
-        public Runtime(String script)
+        Thread runPlatform;
+        readonly object runPlatformLock;
+
+        public Runtime(String script, IConsole console)
         {
+            this.console = console;
             this.cursor = new Cursor(0, 0, parser);
-            this.stacks = new Stack<double>[27];
-            for (int i = 0; i < stacks.Length; i++)
-            {
-                stacks[i] = new Stack<double>();
-            }
-            this.queue = new Queue<double>();
+            this.storage = new Storage();
             this.parser = new Parser(script);
             this.storagePointer = 0;
             this.PreviousCursor = new Stack<Cursor>();
+
+            this.runPlatformLock = new object();
         }
         public Cursor Cursor
         {
@@ -49,6 +52,103 @@ namespace SteamB23.Ahheui
             get
             {
                 return parser.SyntaxField[cursor.i, cursor.j];
+            }
+        }
+        /// <summary>
+        /// 모든 명령들을 실행합니다.
+        /// </summary>
+        public void Run()
+        {
+            isRun = true;
+            if (!runPlatform.IsAlive)
+            {
+                runPlatform = null;
+            }
+            if (runPlatform == null)
+            {
+                runPlatform = new Thread(RepeatRun);
+                runPlatform.Start();
+            }
+        }
+        /// <summary>
+        /// 실행을 정지하고 사용된 자원을 초기화합니다.
+        /// </summary>
+        /// <exception cref="System.Threading.ThreadStateException">
+        /// 구동 스레드가 시작되지 않은 상태에서 이 메서드가 호출된 경우
+        /// </exception>
+        /// <exception cref="System.Threading.ThreadInterruptedException">
+        /// 구동 스레드가 대기중인 상태에서 이 메서드가 호출된 경우
+        /// </exception>
+        public void Reset()
+        {
+            try
+            {
+                Stop();
+            }
+            catch (ThreadStateException)
+            {
+                throw;
+            }
+            catch (ThreadInterruptedException)
+            {
+                throw;
+            }
+            finally
+            {
+                storage.Clear();
+                cursor.Clear();
+                storagePointer = 0;
+            }
+        }
+        /// <summary>
+        /// 실행을 정지합니다.
+        /// </summary>
+        /// <exception cref="System.Threading.ThreadStateException">
+        /// 구동 스레드가 시작되지 않은 상태에서 이 메서드가 호출된 경우
+        /// </exception>
+        /// <exception cref="System.Threading.ThreadInterruptedException">
+        /// 구동 스레드가 대기중인 상태에서 이 메서드가 호출된 경우
+        /// </exception>
+        public void Stop()
+        {
+            isRun = false;
+            try
+            {
+                runPlatform.Join();
+            }
+            catch (ThreadStateException)
+            {
+                throw;
+            }
+            catch (ThreadInterruptedException)
+            {
+                throw;
+            }
+            finally
+            {
+                runPlatform = null;
+            }
+        }
+        /// <summary>
+        /// 한번만 실행합니다.
+        /// </summary>
+        public void OneRun()
+        {
+            lock (runPlatformLock)
+            {
+                CommandRun();
+                if (!isEnd)
+                {
+                    CursorMove();
+                }
+            }
+        }
+        // 스레드에서 돌리기 위한 메서드
+        public void RepeatRun()
+        {
+            while (!isEnd && isRun)
+            {
+                OneRun();
             }
         }
         void CursorMove()
@@ -87,6 +187,7 @@ namespace SteamB23.Ahheui
         }
         void CommandRun()
         {
+            var currentStorage = storage[storagePointer];
             switch (CurrentSyntax.command)
             {
                 case Syntax.Command.Nothing:
@@ -108,49 +209,49 @@ namespace SteamB23.Ahheui
                 case Syntax.Command.Remainder:
                     try
                     {
-                        DoublePopWork(ref stacks[storagePointer], CurrentSyntax.command);
+                        DoublePopWork(ref currentStorage, CurrentSyntax.command);
                     }
                     catch (DivideByZeroException)
                     {
                         // 에러핸들러 호출
+                        // 아직 에러핸들러에 대한 구현이 이루어지지 않았기 때문에 0을 대입.
+                        currentStorage.Push(0);
                     }
                     break;
                 case Syntax.Command.Pop:
-                    stacks[storagePointer].Pop();
+                    currentStorage.Pop();
                     break;
                 case Syntax.Command.Output:
-                    app.Output(stacks[storagePointer].Pop().ToString());
+                    console.Output(currentStorage.Pop().ToString());
                     break;
                 case Syntax.Command.OutputChar:
-                    app.Output(((char)stacks[storagePointer].Pop()).ToString());
+                    console.Output(((char)currentStorage.Pop()).ToString());
                     break;
                 case Syntax.Command.Push:
-                    stacks[storagePointer].Push(GetRawValue(CurrentSyntax.index));
+                    currentStorage.Push(GetRawValue(CurrentSyntax.index));
                     break;
                 case Syntax.Command.Input:
-                    stacks[storagePointer].Push(double.Parse(app.Input()));
+                    currentStorage.Push(double.Parse(console.Input()));
                     break;
                 case Syntax.Command.InputChar:
-                    stacks[storagePointer].Push(char.Parse(app.Input()));
+                    currentStorage.Push(char.Parse(console.Input()));
                     break;
                 case Syntax.Command.Clone:
-                    stacks[storagePointer].Push(stacks[storagePointer].Peek());
+                    currentStorage.Push(currentStorage.Peek());
                     break;
                 case Syntax.Command.Switch:
-                    DoublePopWork(ref stacks[storagePointer], Syntax.Command.Switch);
+                    DoublePopWork(ref currentStorage, Syntax.Command.Switch);
                     break;
                 case Syntax.Command.Pick:
                     storagePointer = (int)CurrentSyntax.index;
                     break;
                 case Syntax.Command.Move:
-                    double temp = stacks[storagePointer].Pop();
-                    stacks[(int)CurrentSyntax.index].Push(temp);
+                    double temp = currentStorage.Pop();
+                    storage[(int)CurrentSyntax.index].Push(temp);
                     break;
-
-                    
             }
         }
-        static void DoublePopWork(ref Stack<double> stack, Syntax.Command command)
+        static void DoublePopWork(ref IStorage stack, Syntax.Command command)
         {
             double t1 = stack.Pop();
             double t2 = stack.Pop();

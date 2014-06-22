@@ -40,10 +40,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cursor.cs" />
-    <Compile Include="IConsoleIO.cs" />
+    <Compile Include="IHandler.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime.cs" />
+    <Compile Include="Storage.cs" />
+    <Compile Include="Storages\IStorage.cs" />
+    <Compile Include="Storages\Queue.cs" />
+    <Compile Include="Storages\Stack.cs" />
     <Compile Include="Syntax.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
