@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{06BD8A0E-844F-4651-A1E5-2E60044137A0}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{D981102C-5210-427D-A1AC-CA5DD70C81FE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SteamB23.Ahheui</RootNamespace>
-    <AssemblyName>Ahheui</AssemblyName>
+    <RootNamespace>SteamB23.Ahheui.FullTest</RootNamespace>
+    <AssemblyName>Ahheui_FullTest</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,10 +23,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;RELEASE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -39,16 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cursor.cs" />
-    <Compile Include="IHandler.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runtime.cs" />
-    <Compile Include="Storage.cs" />
-    <Compile Include="Storages\IStorage.cs" />
-    <Compile Include="Storages\Queue.cs" />
-    <Compile Include="Storages\Stack.cs" />
-    <Compile Include="Syntax.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ahheui\Ahheui.csproj">
+      <Project>{06bd8a0e-844f-4651-a1e5-2e60044137a0}</Project>
+      <Name>Ahheui</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

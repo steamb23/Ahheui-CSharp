@@ -5,37 +5,38 @@ using System.Text;
 
 namespace SteamB23.Ahheui.Storages
 {
-    public class Stack : Stack<double>, IStorage
+    public class Stack : IStorage
     {
+        Stack<double> stack;
         public Stack()
-            : base()
         {
+            stack = new Stack<double>();
         }
         public Stack(IEnumerable<double> collection)
-            : base(collection)
         {
+            stack = new Stack<double>(collection);
         }
         public Stack(int capacity)
-            : base(capacity)
         {
+            stack = new Stack<double>(capacity);
         }
 
         void IStorage.Push(double item)
         {
-            base.Push(item);
+            stack.Push(item);
         }
 
         double IStorage.Pop()
         {
-            return base.Pop();
+            return stack.Pop();
         }
         double IStorage.Peek()
         {
-            return base.Peek();
+            return stack.Peek();
         }
         void IStorage.Clear()
         {
-            base.Clear();
+            stack.Clear();
         }
     }
 }

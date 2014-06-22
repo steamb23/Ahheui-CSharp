@@ -7,8 +7,11 @@ using SteamB23.Ahheui.Storages;
 
 namespace SteamB23.Ahheui
 {
+    public delegate void RuntimeEventHandler(Runtime sender, EventArgs e);
     public class Runtime
     {
+        public event RuntimeEventHandler OneRunEnd;
+
         IConsole console;
 
         Parser parser;
@@ -25,9 +28,9 @@ namespace SteamB23.Ahheui
         public Runtime(String script, IConsole console)
         {
             this.console = console;
-            this.cursor = new Cursor(0, 0, parser);
             this.storage = new Storage();
             this.parser = new Parser(script);
+            this.cursor = new Cursor(0, 0, parser);
             this.storagePointer = 0;
             this.PreviousCursor = new Stack<Cursor>();
 
@@ -54,21 +57,41 @@ namespace SteamB23.Ahheui
                 return parser.SyntaxField[cursor.i, cursor.j];
             }
         }
+        public int StoragePointer
+        {
+            get
+            {
+                return storagePointer;
+            }
+        }
+        public IStorage CurrentStorage
+        {
+            get
+            {
+                return storage[storagePointer];
+            }
+        }
         /// <summary>
         /// 모든 명령들을 실행합니다.
         /// </summary>
         public void Run()
         {
             isRun = true;
-            if (!runPlatform.IsAlive)
-            {
-                runPlatform = null;
-            }
+#if DEBUG
+            RepeatRun();
+#endif
+#if RELEASE
             if (runPlatform == null)
             {
                 runPlatform = new Thread(RepeatRun);
                 runPlatform.Start();
             }
+            else if (!runPlatform.IsAlive)
+            {
+                runPlatform = new Thread(RepeatRun);
+                runPlatform.Start();
+            }
+#endif
         }
         /// <summary>
         /// 실행을 정지하고 사용된 자원을 초기화합니다.
@@ -136,6 +159,7 @@ namespace SteamB23.Ahheui
         {
             lock (runPlatformLock)
             {
+                OneRunEnd(this, EventArgs.Empty);
                 CommandRun();
                 if (!isEnd)
                 {

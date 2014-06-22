@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SteamB23.Ahheui.Storages
 {
-    interface IStorage
+    public interface IStorage
     {
         void Push(double item);
         double Pop();

@@ -104,20 +104,20 @@ namespace SteamB23.Ahheui
                         result = CreateSyntaxTree(Syntax.Command.Remainder, middleChar, lastChar);
                         break;
                     case 6:  // ㅁ
-                        if (lastChar == 11)
+                        if (lastChar == 21)
                             result = CreateSyntaxTree(Syntax.Command.Output, middleChar, 0);
-                        else if (lastChar == 18)
+                        else if (lastChar == 27)
                             result = CreateSyntaxTree(Syntax.Command.OutputChar, middleChar, 0);
                         else
-                            result = CreateSyntaxTree(Syntax.Command.Pop, middleChar, 0);
+                            result = CreateSyntaxTree(Syntax.Command.Pop, middleChar, lastChar);
                         break;
                     case 7:  // ㅂ
-                        if (lastChar == 11)
+                        if (lastChar == 21)
                             result = CreateSyntaxTree(Syntax.Command.Input, middleChar, 0);
-                        else if (lastChar == 18)
+                        else if (lastChar == 27)
                             result = CreateSyntaxTree(Syntax.Command.InputChar, middleChar, 0);
                         else
-                            result = CreateSyntaxTree(Syntax.Command.Push, middleChar, 0);
+                            result = CreateSyntaxTree(Syntax.Command.Push, middleChar, lastChar);
                         break;
                     case 8:  // ㅃ
                         result = CreateSyntaxTree(Syntax.Command.Clone, middleChar, 0);
@@ -183,7 +183,7 @@ namespace SteamB23.Ahheui
         }
         Syntax CreateSyntaxTree(Syntax.Command command, int middleChar, int lastChar)
         {
-            return new Syntax(command, ToMoveCommand(middleChar), (Syntax.Index)lastChar);
+            return new Syntax(command, ToMoveCommand(middleChar), ToIndex(lastChar));
         }
     }
 

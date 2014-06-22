@@ -5,37 +5,38 @@ using System.Text;
 
 namespace SteamB23.Ahheui.Storages
 {
-    class Queue : Queue<double>, IStorage
+    public class Queue : IStorage
     {
+        Queue<double> queue;
         public Queue()
-            : base()
         {
+            queue = new Queue<double>();
         }
         public Queue(IEnumerable<double> collection)
-            : base(collection)
         {
+            queue = new Queue<double>(collection);
         }
         public Queue(int capacity)
-            : base(capacity)
         {
+            queue = new Queue<double>(capacity);
         }
 
         void IStorage.Push(double item)
         {
-            base.Enqueue(item);
+            queue.Enqueue(item);
         }
 
         double IStorage.Pop()
         {
-            return base.Dequeue();
+            return queue.Dequeue();
         }
         double IStorage.Peek()
         {
-            return base.Peek();
+            return queue.Peek();
         }
         void IStorage.Clear()
         {
-            base.Clear();
+            queue.Clear();
         }
     }
 }
