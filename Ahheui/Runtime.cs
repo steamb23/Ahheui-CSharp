@@ -190,5 +190,9 @@ namespace SteamB23.Ahheui
                 OneRun();
             }
         }
+        public void Wait()
+        {
+            runPlatform.Join();
+        }
     }
 }
