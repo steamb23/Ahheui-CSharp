@@ -87,6 +87,20 @@ namespace SteamB23.Ahheui
                 isEventCall = value;
             }
         }
+        public bool IsRun
+        {
+            get
+            {
+                return isRun;
+            }
+        }
+        public bool IsEnd
+        {
+            get
+            {
+                return isEnd;
+            }
+        }
         /// <summary>
         /// 모든 명령들을 실행합니다.
         /// </summary>
