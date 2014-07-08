@@ -10,6 +10,8 @@ namespace SteamB23.Ahheui
     public partial class Runtime
     {
         public event EventHandler OneRunning;
+        public event EventHandler Endding;
+        public event EventHandler Endded;
         bool isEventCall;
 
         IConsole console;
@@ -21,6 +23,8 @@ namespace SteamB23.Ahheui
         Stack<Cursor> PreviousCursor;
         bool isEnd;
         bool isRun;
+        bool isCursorMovePass;
+        Syntax.Move previousMove;
 
         Thread runPlatform;
         readonly object runPlatformLock;
@@ -35,10 +39,12 @@ namespace SteamB23.Ahheui
 
             this.runPlatformLock = new object();
         }
-        public Runtime(String script, IConsole console, EventHandler OneRunning)
+        public Runtime(String script, IConsole console, EventHandler Endded, EventHandler Endding, EventHandler OneRunning)
             : this(script, console)
         {
-            this.OneRunning = OneRunning;
+            this.Endded += Endded;
+            this.Endding += Endding;
+            this.OneRunning += OneRunning;
             isEventCall = true;
         }
         public Cursor Cursor
@@ -111,12 +117,7 @@ namespace SteamB23.Ahheui
             RepeatRun();
 #endif
 #if RELEASE
-            if (runPlatform == null)
-            {
-                runPlatform = new Thread(RepeatRun);
-                runPlatform.Start();
-            }
-            else if (!runPlatform.IsAlive)
+            if (runPlatform == null || !runPlatform.IsAlive)
             {
                 runPlatform = new Thread(RepeatRun);
                 runPlatform.Start();
@@ -134,24 +135,11 @@ namespace SteamB23.Ahheui
         /// </exception>
         public void Reset()
         {
-            try
-            {
-                Stop();
-            }
-            catch (ThreadStateException)
-            {
-                throw;
-            }
-            catch (ThreadInterruptedException)
-            {
-                throw;
-            }
-            finally
-            {
-                storage.Clear();
-                cursor.Clear();
-                storagePointer = 0;
-            }
+            Stop();
+            isEnd = false;
+            storage.Clear();
+            cursor.Clear();
+            storagePointer = 0;
         }
         /// <summary>
         /// 실행을 정지합니다.
@@ -165,35 +153,20 @@ namespace SteamB23.Ahheui
         public void Stop()
         {
             isRun = false;
-            try
-            {
-                runPlatform.Join();
-            }
-            catch (ThreadStateException)
-            {
-                throw;
-            }
-            catch (ThreadInterruptedException)
-            {
-                throw;
-            }
-            finally
-            {
-                runPlatform = null;
-            }
         }
         /// <summary>
         /// 한번만 실행합니다.
         /// </summary>
         public void OneRun()
         {
+            isCursorMovePass = false;
             lock (runPlatformLock)
             {
                 if (isEventCall)
                     OneRunning(this, EventArgs.Empty);
-                CommandRun();
-                if (!isEnd)
-                    CursorMove();
+                CommandRun(CurrentSyntax.command);
+                if (!isEnd && !isCursorMovePass)
+                    CursorMove(CurrentSyntax.move);
             }
         }
         // 스레드에서 돌리기 위한 메서드
@@ -203,6 +176,8 @@ namespace SteamB23.Ahheui
             {
                 OneRun();
             }
+            if (isEventCall)
+                Endded(this, EventArgs.Empty);
         }
         public void Wait()
         {

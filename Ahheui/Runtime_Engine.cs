@@ -8,49 +8,93 @@ namespace SteamB23.Ahheui
 {
     public partial class Runtime
     {
-        void CursorMove()
+        void CursorMove(Syntax.Move move)
         {
-            switch (CurrentSyntax.move)
+            switch (move)
             {
                 case Syntax.Move.Up:
                     cursor.i--;
+                    previousMove = move;
                     break;
                 case Syntax.Move.Down:
                     cursor.i++;
+                    previousMove = move;
                     break;
                 case Syntax.Move.Right:
                     cursor.j++;
+                    previousMove = move;
                     break;
                 case Syntax.Move.Left:
                     cursor.j--;
+                    previousMove = move;
                     break;
                 case Syntax.Move.UpJump:
                     cursor.i--;
                     cursor.i--;
+                    previousMove = move;
                     break;
                 case Syntax.Move.DownJump:
                     cursor.i++;
                     cursor.i++;
+                    previousMove = move;
                     break;
                 case Syntax.Move.RightJump:
                     cursor.j++;
                     cursor.j++;
+                    previousMove = move;
                     break;
                 case Syntax.Move.LeftJump:
                     cursor.j--;
                     cursor.j--;
+                    previousMove = move;
+                    break;
+                default:
+                    switch (previousMove)
+                    {
+                        case Syntax.Move.Up:
+                            cursor.i--;
+                            break;
+                        case Syntax.Move.Down:
+                            cursor.i++;
+                            break;
+                        case Syntax.Move.Right:
+                            cursor.j++;
+                            break;
+                        case Syntax.Move.Left:
+                            cursor.j--;
+                            break;
+                        case Syntax.Move.UpJump:
+                            cursor.i--;
+                            cursor.i--;
+                            break;
+                        case Syntax.Move.DownJump:
+                            cursor.i++;
+                            cursor.i++;
+                            break;
+                        case Syntax.Move.RightJump:
+                            cursor.j++;
+                            cursor.j++;
+                            break;
+                        case Syntax.Move.LeftJump:
+                            cursor.j--;
+                            cursor.j--;
+                            break;
+                    }
                     break;
             }
         }
-        void CommandRun()
+        void CommandRun(Syntax.Command command)
         {
             var currentStorage = storage[storagePointer];
-            switch (CurrentSyntax.command)
+            var cword = CurrentWord;
+            switch (command)
             {
                 case Syntax.Command.Nothing:
                     break;
                 case Syntax.Command.End:
                     isEnd = true;
+            if (isEventCall)
+                Endding(this, EventArgs.Empty);
                     break;
                 case Syntax.Command.Goto:
                     //                       텍스트 검색을 해야한다.. 미친..
@@ -79,7 +123,8 @@ namespace SteamB23.Ahheui
                     currentStorage.Pop();
                     break;
                 case Syntax.Command.Output:
-                    console.Output(currentStorage.Pop().ToString());
+                    string stemp = (currentStorage.Pop()).ToString();
+                    console.Output(stemp);
                     break;
                 case Syntax.Command.OutputChar:
                     console.Output(((char)currentStorage.Pop()).ToString());
@@ -88,7 +133,7 @@ namespace SteamB23.Ahheui
                     currentStorage.Push(GetRawValue(CurrentSyntax.index));
                     break;
                 case Syntax.Command.Input:
-                    currentStorage.Push(double.Parse(console.Input()));
+                    currentStorage.Push(long.Parse(console.Input()));
                     break;
                 case Syntax.Command.InputChar:
                     currentStorage.Push(char.Parse(console.Input()));
@@ -97,21 +142,61 @@ namespace SteamB23.Ahheui
                     currentStorage.Push(currentStorage.Peek());
                     break;
                 case Syntax.Command.Switch:
-                    DoublePopWork(ref currentStorage, Syntax.Command.Switch);
+                    DoublePopWork(ref currentStorage, CurrentSyntax.command);
                     break;
                 case Syntax.Command.Pick:
                     storagePointer = (int)CurrentSyntax.index;
                     break;
                 case Syntax.Command.Move:
-                    double temp = currentStorage.Pop();
+                    long temp = currentStorage.Pop();
                     storage[(int)CurrentSyntax.index].Push(temp);
+                    break;
+                case Syntax.Command.Compare:
+                    DoublePopWork(ref currentStorage, CurrentSyntax.command);
+                    break;
+                case Syntax.Command.Condition:
+                    if (currentStorage.Pop() == 0)
+                    {
+                        isCursorMovePass = true;
+                        switch (CurrentSyntax.move)
+                        {
+                            case Syntax.Move.Up:
+                                cursor.i++;
+                                break;
+                            case Syntax.Move.Down:
+                                cursor.i--;
+                                break;
+                            case Syntax.Move.Right:
+                                cursor.j--;
+                                break;
+                            case Syntax.Move.Left:
+                                cursor.j++;
+                                break;
+                            case Syntax.Move.UpJump:
+                                cursor.i++;
+                                cursor.i++;
+                                break;
+                            case Syntax.Move.DownJump:
+                                cursor.i--;
+                                cursor.i--;
+                                break;
+                            case Syntax.Move.RightJump:
+                                cursor.j--;
+                                cursor.j--;
+                                break;
+                            case Syntax.Move.LeftJump:
+                                cursor.j++;
+                                cursor.j++;
+                                break;
+                        }
+                    }
                     break;
             }
         }
         static void DoublePopWork(ref IStorage stack, Syntax.Command command)
         {
-            double t1 = stack.Pop();
-            double t2 = stack.Pop();
+            long t1 = stack.Pop();
+            long t2 = stack.Pop();
             switch (command)
             {
                 case Syntax.Command.Addition:
@@ -133,14 +218,21 @@ namespace SteamB23.Ahheui
                     stack.Push(t1);
                     stack.Push(t2);
                     break;
+                case Syntax.Command.Compare:
+                    if (t1 <= t2)
+                        stack.Push(1);
+                    else
+                        stack.Push(0);
+                    break;
             }
         }
-        static double GetRawValue(Syntax.Index index)
+        static long GetRawValue(Syntax.Index index)
         {
             switch (index)
             {
                 case Syntax.Index.ㄱ:
                 case Syntax.Index.ㄴ:
+                case Syntax.Index.ㅅ:
                     return 2;
                 case Syntax.Index.ㄷ:
                 case Syntax.Index.ㅈ:
@@ -148,7 +240,6 @@ namespace SteamB23.Ahheui
                     return 3;
                 case Syntax.Index.ㅁ:
                 case Syntax.Index.ㅂ:
-                case Syntax.Index.ㅅ:
                 case Syntax.Index.ㅊ:
                 case Syntax.Index.ㅌ:
                 case Syntax.Index.ㅍ:

@@ -7,9 +7,9 @@ namespace SteamB23.Ahheui.Storages
 {
     public interface IStorage
     {
-        void Push(double item);
-        double Pop();
+        void Push(long item);
+        long Pop();
         void Clear();
-        double Peek();
+        long Peek();
     }
 }

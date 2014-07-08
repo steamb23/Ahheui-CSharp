@@ -26,8 +26,12 @@ namespace SteamB23.Ahheui
             }
             set
             {
-                _i = (value < 0) ? parser.SyntaxField.GetLength(0) : value;
-                _i = (value >= parser.SyntaxField.GetLength(0)) ? 0 : value;
+                if (value < 0)
+                    _i = parser.SyntaxField.GetLength(0)-1;
+                else if (value >= parser.SyntaxField.GetLength(0))
+                    _i = 0;
+                else
+                    _i = value;
             }
         }
         public int j
@@ -38,8 +42,12 @@ namespace SteamB23.Ahheui
             }
             set
             {
-                _j = (value < 0) ? parser.SyntaxField.GetLength(1) : value;
-                _j = (value >= parser.SyntaxField.GetLength(1)) ? 0 : value;
+                if (value < 0)
+                    _j = parser.SyntaxField.GetLength(1)-1;
+                else if (value >= parser.SyntaxField.GetLength(1))
+                    _j = 0;
+                else
+                    _j = value;
             }
         }
         public void Clear()

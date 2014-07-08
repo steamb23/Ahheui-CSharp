@@ -7,32 +7,39 @@ namespace SteamB23.Ahheui.Storages
 {
     public class Queue : IStorage
     {
-        Queue<double> queue;
+        Queue<long> queue;
         public Queue()
         {
-            queue = new Queue<double>();
+            queue = new Queue<long>();
         }
-        public Queue(IEnumerable<double> collection)
+        public Queue(IEnumerable<long> collection)
         {
-            queue = new Queue<double>(collection);
+            queue = new Queue<long>(collection);
         }
         public Queue(int capacity)
         {
-            queue = new Queue<double>(capacity);
+            queue = new Queue<long>(capacity);
         }
 
-        void IStorage.Push(double item)
+        void IStorage.Push(long item)
         {
             queue.Enqueue(item);
         }
 
-        double IStorage.Pop()
+        long IStorage.Pop()
         {
             return queue.Dequeue();
         }
-        double IStorage.Peek()
+        long IStorage.Peek()
         {
-            return queue.Peek();
+            try
+            {
+                return queue.Peek();
+            }
+            catch (InvalidOperationException)
+            {
+                return 0;
+            }
         }
         void IStorage.Clear()
         {

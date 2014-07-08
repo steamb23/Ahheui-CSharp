@@ -7,32 +7,46 @@ namespace SteamB23.Ahheui.Storages
 {
     public class Stack : IStorage
     {
-        Stack<double> stack;
+        Stack<long> stack;
         public Stack()
         {
-            stack = new Stack<double>();
+            stack = new Stack<long>();
         }
-        public Stack(IEnumerable<double> collection)
+        public Stack(IEnumerable<long> collection)
         {
-            stack = new Stack<double>(collection);
+            stack = new Stack<long>(collection);
         }
         public Stack(int capacity)
         {
-            stack = new Stack<double>(capacity);
+            stack = new Stack<long>(capacity);
         }
 
-        void IStorage.Push(double item)
+        void IStorage.Push(long item)
         {
             stack.Push(item);
         }
 
-        double IStorage.Pop()
+        long IStorage.Pop()
         {
-            return stack.Pop();
+            try
+            {
+                return stack.Pop();
+            }
+            catch (InvalidOperationException)
+            {
+                return 0;
+            }
         }
-        double IStorage.Peek()
+        long IStorage.Peek()
         {
-            return stack.Peek();
+            try
+            {
+                return stack.Peek();
+            }
+            catch(InvalidOperationException)
+            {
+                return 0;
+            }
         }
         void IStorage.Clear()
         {

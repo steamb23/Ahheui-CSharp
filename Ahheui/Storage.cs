@@ -49,7 +49,13 @@ namespace SteamB23.Ahheui
         {
             foreach (var temp in storages)
             {
-                temp.Clear();
+                try
+                {
+                    temp.Clear();
+                }
+                catch (NullReferenceException)
+                {
+                }
             }
         }
     }

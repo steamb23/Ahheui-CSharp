@@ -57,7 +57,14 @@ namespace SteamB23.Ahheui
             {
                 for (int j = 0; j < totalLength; j++)
                 {
-                    result[i, j] = words[i][j];
+                    try
+                    {
+                        result[i, j] = words[i][j];
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        result[i, j] = '아';
+                    }
                 }
             }
             return result;
