@@ -11,9 +11,12 @@ namespace SteamB23.Ahheui_WinForm
 {
     public partial class Input : Form
     {
-        public Input()
+        string inputType;
+        public Input(string inputType)
         {
+            this.inputType = inputType;
             InitializeComponent();
+            this.Text = string.Format("{0} - {1}", this.Text, inputType);
         }
     }
 }

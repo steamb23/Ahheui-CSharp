@@ -20,12 +20,17 @@ namespace SteamB23.Ahheui.Storages
         {
             queue = new Queue<long>(capacity);
         }
-
         void IStorage.Push(long item)
         {
             queue.Enqueue(item);
         }
-
+        void IStorage.Push(long[] item)
+        {
+            foreach (var temp in item)
+            {
+                queue.Enqueue(temp);
+            }
+        }
         long IStorage.Pop()
         {
             return queue.Dequeue();
@@ -44,6 +49,16 @@ namespace SteamB23.Ahheui.Storages
         void IStorage.Clear()
         {
             queue.Clear();
+        }
+        long[] IStorage.Copy()
+        {
+            List<long> result = new List<long>();
+            foreach (var temp in queue)
+            {
+                result.Add(temp);
+            }
+            return result.ToArray();
+            
         }
     }
 }

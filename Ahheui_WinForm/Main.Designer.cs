@@ -120,6 +120,7 @@
             // 
             // Main
             // 
+            this.AcceptButton = this.btn_run;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 484);
@@ -134,7 +135,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(600, 400);
             this.Name = "Main";
-            this.Text = "Ahheui";
+            this.Text = "아희희 인터프리터";
             this.ResumeLayout(false);
             this.PerformLayout();
 

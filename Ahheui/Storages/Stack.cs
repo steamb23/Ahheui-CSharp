@@ -25,7 +25,13 @@ namespace SteamB23.Ahheui.Storages
         {
             stack.Push(item);
         }
-
+        void IStorage.Push(long[] item)
+        {
+            foreach (var temp in item)
+            {
+                stack.Push(temp);
+            }
+        }
         long IStorage.Pop()
         {
             try
@@ -51,6 +57,15 @@ namespace SteamB23.Ahheui.Storages
         void IStorage.Clear()
         {
             stack.Clear();
+        }
+        long[] IStorage.Copy()
+        {
+            List<long> result = new List<long>();
+            foreach (var temp in stack)
+            {
+                result.Add(temp);
+            }
+            return result.ToArray();
         }
     }
 }

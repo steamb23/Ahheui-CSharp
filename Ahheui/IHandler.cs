@@ -8,6 +8,11 @@ namespace SteamB23.Ahheui
     public interface IConsole
     {
         void Output(string output);
-        string Input();
+        string Input(InputType inputType);
+    }
+    public enum InputType
+    {
+        Number,
+        Char
     }
 }

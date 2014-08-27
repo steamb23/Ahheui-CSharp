@@ -11,8 +11,7 @@ namespace SteamB23.Ahheui
     {
         public event EventHandler OneRunning;
         public event EventHandler Endding;
-        public event EventHandler Endded;
-        bool isEventCall;
+        public event EventHandler Stoping;
 
         IConsole console;
 
@@ -38,14 +37,6 @@ namespace SteamB23.Ahheui
             this.PreviousCursor = new Stack<Cursor>();
 
             this.runPlatformLock = new object();
-        }
-        public Runtime(String script, IConsole console, EventHandler Endded, EventHandler Endding, EventHandler OneRunning)
-            : this(script, console)
-        {
-            this.Endded += Endded;
-            this.Endding += Endding;
-            this.OneRunning += OneRunning;
-            isEventCall = true;
         }
         public Cursor Cursor
         {
@@ -80,17 +71,6 @@ namespace SteamB23.Ahheui
             get
             {
                 return storage[storagePointer];
-            }
-        }
-        public bool IsEventCall
-        {
-            get
-            {
-                return isEventCall;
-            }
-            set
-            {
-                isEventCall = value;
             }
         }
         public bool IsRun
@@ -155,6 +135,22 @@ namespace SteamB23.Ahheui
             isRun = false;
         }
         /// <summary>
+        /// <c>StorageBackup</c>객체에서 스토리지를 덮어씌웁니다.
+        /// </summary>
+        /// <param name="backup">스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</param>
+        public void Restore(StorageBackup backup)
+        {
+            storage.Restore(backup);
+        }
+        /// <summary>
+        /// 스토리지를 백업합니다.
+        /// </summary>
+        /// <returns>스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</returns>
+        public StorageBackup Backup()
+        {
+            return storage.Backup();
+        }
+        /// <summary>
         /// 한번만 실행합니다.
         /// </summary>
         public void OneRun()
@@ -162,7 +158,7 @@ namespace SteamB23.Ahheui
             isCursorMovePass = false;
             lock (runPlatformLock)
             {
-                if (isEventCall)
+                if (OneRunning != null)
                     OneRunning(this, EventArgs.Empty);
                 CommandRun(CurrentSyntax.command);
                 if (!isEnd && !isCursorMovePass)
@@ -176,8 +172,8 @@ namespace SteamB23.Ahheui
             {
                 OneRun();
             }
-            if (isEventCall)
-                Endded(this, EventArgs.Empty);
+            if (Stoping != null)
+                Stoping(this, EventArgs.Empty);
         }
         public void Wait()
         {

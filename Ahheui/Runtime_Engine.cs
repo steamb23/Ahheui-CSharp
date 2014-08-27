@@ -93,7 +93,7 @@ namespace SteamB23.Ahheui
                     break;
                 case Syntax.Command.End:
                     isEnd = true;
-            if (isEventCall)
+            if (Endding!=null)
                 Endding(this, EventArgs.Empty);
                     break;
                 case Syntax.Command.Goto:
@@ -133,10 +133,28 @@ namespace SteamB23.Ahheui
                     currentStorage.Push(GetRawValue(CurrentSyntax.index));
                     break;
                 case Syntax.Command.Input:
-                    currentStorage.Push(long.Parse(console.Input()));
+            INPUT_RETRY:
+                    try
+                    {
+                        currentStorage.Push(long.Parse(console.Input(InputType.Number)));
+                    }
+                    catch (Exception)
+                    {
+                        System.Media.SystemSounds.Beep.Play();
+                        goto INPUT_RETRY;
+                    }
                     break;
                 case Syntax.Command.InputChar:
-                    currentStorage.Push(char.Parse(console.Input()));
+                INPUT_CHAR_RETRY:
+                    try
+                    {
+                        currentStorage.Push(char.Parse(console.Input(InputType.Char)));
+                    }
+                    catch (Exception)
+                    {
+                        System.Media.SystemSounds.Beep.Play();
+                        goto INPUT_CHAR_RETRY;
+                    }
                     break;
                 case Syntax.Command.Clone:
                     currentStorage.Push(currentStorage.Peek());
