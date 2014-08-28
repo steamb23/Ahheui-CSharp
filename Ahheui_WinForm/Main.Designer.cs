@@ -105,6 +105,7 @@
             this.txtBox_scriptBox.Size = new System.Drawing.Size(560, 312);
             this.txtBox_scriptBox.TabIndex = 6;
             this.txtBox_scriptBox.WordWrap = false;
+            this.txtBox_scriptBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtBox_scriptBox_KeyDown);
             // 
             // txtBox_outputBox
             // 
@@ -117,6 +118,7 @@
             this.txtBox_outputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtBox_outputBox.Size = new System.Drawing.Size(560, 114);
             this.txtBox_outputBox.TabIndex = 7;
+            this.txtBox_outputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtBox_scriptBox_KeyDown);
             // 
             // Main
             // 

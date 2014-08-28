@@ -12,10 +12,10 @@ namespace SteamB23.Ahheui_WinForm
 {
     public partial class Main : Form, IConsole
     {
-        string activatedScript = "";
         Runtime runtime;
         StringBuilder outputString = new StringBuilder();
-        StorageBackup backup;
+        Backup backup = null;
+        bool isReset = false;
         public Main()
             : base()
         {
@@ -25,17 +25,22 @@ namespace SteamB23.Ahheui_WinForm
         void RuntimeInitialize(string script)
         {
             runtime = new Runtime(script, this);
-            runtime.Endding += Endding;
+            runtime.Finishing += Endding;
+            runtime.CallRun += Run;
+            runtime.CallReset += Reset;
         }
         #region IConsole구현
         void IConsole.Output(string output)
         {
-            //if (output != "\r\n" && output == "\n" && output == "\r")
-            //    output = "\r\n";
-            txtBox_outputBox.Invoke(new Action(() =>
+            if (output == "\n" || output == "\r")
+                output = System.Environment.NewLine;
+            if (!(isReset||this.IsDisposed))
             {
-                txtBox_outputBox.AppendText(output);
-            }));
+                txtBox_outputBox.Invoke(new Action(() =>
+                {
+                    txtBox_outputBox.AppendText(output);
+                }));
+            }
         }
 
         string IConsole.Input(InputType inputType)
@@ -64,7 +69,7 @@ namespace SteamB23.Ahheui_WinForm
                             return input.txtbox_char.Text;
                         case DialogResult.Cancel:
                         default:
-                            Abort();
+                            backup = runtime.Abort();
                             return "0";
                     }
                 }));
@@ -95,55 +100,85 @@ namespace SteamB23.Ahheui_WinForm
 
             //MessageBox.Show(temp);
         }
-        #endregion
-        void Run()
+        // 실행시 backup이 있으면 복구후 삭제
+        void Run(object sender, EventArgs e)
         {
-            if (runtime.IsEnd)
-                Clear();
-            var boxScript = this.txtBox_scriptBox.Text.Replace("\r", "");
-            if (activatedScript != boxScript)
+            if (backup != null)
             {
-                activatedScript = boxScript;
+                runtime.Restore(backup);
+                backup = null;
+            }
+            
+        }
+        void Stop(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        void Abort(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        void Reset(object sender, EventArgs e)
+        {
+            txtBox_outputBox.Invoke(new Action(() =>
+            {
+                txtBox_outputBox.Text = "";
+            }));
+        }
+        #endregion
+        private void btn_run_Click(object sender, EventArgs e)
+        {
+            this.isReset = false;
+            if (runtime.IsEnd)
+                runtime.Reset();
+            var boxScript = this.txtBox_scriptBox.Text.Replace("\r", "");
+            if (runtime.Script != boxScript)
+            {
+                this.txtBox_outputBox.Text = "";
                 RuntimeInitialize(boxScript);
             }
             if (runtime != null)
                 runtime.Run();
         }
-        void Stop()
+        private void btn_stop_Click(object sender, EventArgs e)
         {
             if (runtime != null)
                 runtime.Stop();
-        }
-        void Abort()
-        {
-            this.backup = runtime.Backup();
-            Stop();
-        }
-        void Clear()
-        {
-            this.txtBox_outputBox.Text = "";
-            if (runtime != null)
-                runtime.Reset();
-        }
-        private void btn_run_Click(object sender, EventArgs e)
-        {
-            Run();
-        }
-        private void btn_stop_Click(object sender, EventArgs e)
-        {
-            Stop();
         }
 
         private void btn_oneRun_Click(object sender, EventArgs e)
         {
             if (runtime != null)
                 if (!runtime.IsRun)
-                    runtime.OneRun();
+                    runtime.OnceRun();
         }
 
         private void btn_clear_Click(object sender, EventArgs e)
         {
-            Clear();
+            runtime.Reset();
+        }
+
+        private void txtBox_scriptBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.T:
+                        (sender as TextBox).Cut();
+                        break;
+                    case Keys.C:
+                        (sender as TextBox).Copy();
+                        break;
+                    case Keys.A:
+                        (sender as TextBox).SelectAll();
+                        break;
+                    case Keys.D:
+                        if (!(sender as TextBox).ReadOnly)
+                            (sender as TextBox).Text = "";
+                        break;
+                }
+            }
         }
     }
 }
