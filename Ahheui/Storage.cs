@@ -61,7 +61,7 @@ namespace SteamB23.Ahheui
                 }
             }
         }
-        public StorageBackup Backup()
+        public Backup Backup()
         {
             // 초기화
             Storages.IStorage[] storages;
@@ -72,9 +72,9 @@ namespace SteamB23.Ahheui
                 storages[i].Push(this.storages[i].Copy());
             }
             // 리턴
-            return new StorageBackup(storages);
+            return new Backup(storages);
         }
-        public void Restore(StorageBackup backup)
+        public void Restore(Backup backup)
         {
             this.storages = backup.storages;
         }

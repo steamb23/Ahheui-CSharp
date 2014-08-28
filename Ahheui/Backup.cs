@@ -5,9 +5,9 @@ using System.Text;
 
 namespace SteamB23.Ahheui
 {
-    public struct StorageBackup
+    public struct Backup
     {
-        internal StorageBackup(Storages.IStorage[] storages)
+        internal Backup(Storages.IStorage[] storages)
         {
             this.storages = storages;
         }

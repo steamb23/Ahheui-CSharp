@@ -190,16 +190,17 @@ namespace SteamB23.Ahheui
         /// <summary>
         /// 실행을 정지하고 백업을 반환합니다.
         /// </summary>
-        public void Abort()
+        public Backup Abort()
         {
             OnCallAbort();
             Stop();
+            return Backup();
         }
         /// <summary>
         /// <c>StorageBackup</c>객체에서 스토리지를 덮어씌웁니다.
         /// </summary>
         /// <param name="backup">스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</param>
-        public void Restore(StorageBackup backup)
+        public void Restore(Backup backup)
         {
             storage.Restore(backup);
         }
@@ -207,7 +208,7 @@ namespace SteamB23.Ahheui
         /// 스토리지를 백업합니다.
         /// </summary>
         /// <returns>스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</returns>
-        public StorageBackup Backup()
+        public Backup Backup()
         {
             lock (runPlatformLock)
             {
