@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using SteamB23.Ahheui.Storages;
 
 namespace SteamB23.Ahheui
@@ -41,6 +42,10 @@ namespace SteamB23.Ahheui
         /// <c>Abort</c>메서드가 호출될 때 호출됩니다.
         /// </summary>
         public event EventHandler CallAbort;
+        /// <summary>
+        /// <c>Reset</c>메서드가 호출될 때 호출됩니다.
+        /// </summary>
+        public event EventHandler CallReset;
         void OnOnceRunning()
         {
             if (OnceRunning != null)
@@ -76,9 +81,15 @@ namespace SteamB23.Ahheui
             if (CallAbort != null)
                 CallAbort(this, EventArgs.Empty);
         }
+        void OnCallReset()
+        {
+            if (CallReset != null)
+                CallReset(this, EventArgs.Empty);
+        }
         #endregion
         IConsole console;
 
+        string script;
         Parser parser;
         Cursor cursor;
         Storage storage;
@@ -91,8 +102,9 @@ namespace SteamB23.Ahheui
 
         Thread runPlatform;
         readonly object runPlatformLock;
-        public Runtime(String script, IConsole console)
+        public Runtime(string script, IConsole console)
         {
+            this.script = script;
             this.console = console;
             this.storage = new Storage();
             this.parser = new Parser(script);
@@ -101,6 +113,13 @@ namespace SteamB23.Ahheui
             this.PreviousCursor = new Stack<Cursor>();
 
             this.runPlatformLock = new object();
+        }
+        public string Script
+        {
+            get
+            {
+                return script;
+            }
         }
         public Cursor Cursor
         {
@@ -174,10 +193,16 @@ namespace SteamB23.Ahheui
         public void Reset()
         {
             Stop();
-            isEnd = false;
-            storage.Clear();
-            cursor.Clear();
-            storagePointer = 0;
+            OnCallReset();
+            Parallel.Invoke(() =>
+            {
+                isEnd = false;
+                runPlatform.Join();
+                isEnd = false;
+                storage.Clear();
+                cursor.Clear();
+                storagePointer = 0;
+            });
         }
         /// <summary>
         /// 실행을 정지합니다.
@@ -194,6 +219,7 @@ namespace SteamB23.Ahheui
         {
             OnCallAbort();
             Stop();
+            isCursorMovePass = true;
             return Backup();
         }
         /// <summary>
@@ -210,10 +236,7 @@ namespace SteamB23.Ahheui
         /// <returns>스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</returns>
         public Backup Backup()
         {
-            lock (runPlatformLock)
-            {
-                return storage.Backup();
-            }
+            return storage.Backup();
         }
         /// <summary>
         /// 한번만 실행합니다.
@@ -237,11 +260,7 @@ namespace SteamB23.Ahheui
             {
                 OnceRun();
             }
-            OnRepeatRunEndding();
-        }
-        public void Wait()
-        {
-            runPlatform.Join();
+            //OnRepeatRunEndding();
         }
     }
 }

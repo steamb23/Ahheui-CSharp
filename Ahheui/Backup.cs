@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SteamB23.Ahheui
 {
-    public struct Backup
+    public class Backup
     {
         internal Backup(Storages.IStorage[] storages)
         {

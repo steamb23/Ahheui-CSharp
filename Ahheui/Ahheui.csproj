@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackupEventArgs.cs" />
     <Compile Include="Cursor.cs" />
     <Compile Include="IHandler.cs" />
     <Compile Include="Parser.cs" />
