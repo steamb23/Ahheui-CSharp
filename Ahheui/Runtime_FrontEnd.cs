@@ -9,10 +9,74 @@ namespace SteamB23.Ahheui
 {
     public partial class Runtime
     {
-        public event EventHandler OneRunning;
-        public event EventHandler Endding;
-        public event EventHandler Stoping;
-
+        #region 이벤트
+        /// <summary>
+        /// 한번 실행될때마다 호출됩니다.
+        /// </summary>
+        /// <remarks>
+        /// <c>OnceRun</c>메서드를 수동으로 호출하였거나, <c>Run</c>메서드, <c>RepeatRun</c>메서드에서 <c>OnceRun</c>메서드를 호출했을 때에도 호출됩니다.
+        /// </remarks>
+        public event EventHandler OnceRunning;
+        /// <summary>
+        /// 한번 실행후 호출됩니다.
+        /// </summary>
+        public event EventHandler OnceRan;
+        /// <summary>
+        /// 스크립트의 진행이 정상적으로 완전히 종료되었을때 호출됩니다.
+        /// </summary>
+        public event EventHandler Finishing;
+        /// <summary>
+        /// 반복 실행이 완전히 종료되었을 때 호출됩니다.
+        /// </summary>
+        public event EventHandler RepeatRunEndding;
+        /// <summary>
+        /// <c>Run</c>메서드가 호출될 때 호출됩니다.
+        /// </summary>
+        public event EventHandler CallRun;
+        /// <summary>
+        /// <c>Stop</c>메서드가 호출될 때 호출됩니다.
+        /// </summary>
+        public event EventHandler CallStop;
+        /// <summary>
+        /// <c>Abort</c>메서드가 호출될 때 호출됩니다.
+        /// </summary>
+        public event EventHandler CallAbort;
+        void OnOnceRunning()
+        {
+            if (OnceRunning != null)
+                OnceRunning(this, EventArgs.Empty);
+        }
+        void OnOnceRan()
+        {
+            if (OnceRan != null)
+                OnceRan(this, EventArgs.Empty);
+        }
+        void OnFinishing()
+        {
+            if (Finishing != null)
+                Finishing(this, EventArgs.Empty);
+        }
+        void OnRepeatRunEndding()
+        {
+            if (RepeatRunEndding != null)
+                RepeatRunEndding(this, EventArgs.Empty);
+        }
+        void OnCallRun()
+        {
+            if (CallRun != null)
+                CallRun(this, EventArgs.Empty);
+        }
+        void OnCallStop()
+        {
+            if (CallStop != null)
+                CallStop(this, EventArgs.Empty);
+        }
+        void OnCallAbort()
+        {
+            if (CallAbort != null)
+                CallAbort(this, EventArgs.Empty);
+        }
+        #endregion
         IConsole console;
 
         Parser parser;
@@ -107,12 +171,6 @@ namespace SteamB23.Ahheui
         /// <summary>
         /// 실행을 정지하고 사용된 자원을 초기화합니다.
         /// </summary>
-        /// <exception cref="System.Threading.ThreadStateException">
-        /// 구동 스레드가 시작되지 않은 상태에서 이 메서드가 호출된 경우
-        /// </exception>
-        /// <exception cref="System.Threading.ThreadInterruptedException">
-        /// 구동 스레드가 대기중인 상태에서 이 메서드가 호출된 경우
-        /// </exception>
         public void Reset()
         {
             Stop();
@@ -124,15 +182,18 @@ namespace SteamB23.Ahheui
         /// <summary>
         /// 실행을 정지합니다.
         /// </summary>
-        /// <exception cref="System.Threading.ThreadStateException">
-        /// 구동 스레드가 시작되지 않은 상태에서 이 메서드가 호출된 경우
-        /// </exception>
-        /// <exception cref="System.Threading.ThreadInterruptedException">
-        /// 구동 스레드가 대기중인 상태에서 이 메서드가 호출된 경우
-        /// </exception>
         public void Stop()
         {
+            OnCallStop();
             isRun = false;
+        }
+        /// <summary>
+        /// 실행을 정지하고 백업을 반환합니다.
+        /// </summary>
+        public void Abort()
+        {
+            OnCallAbort();
+            Stop();
         }
         /// <summary>
         /// <c>StorageBackup</c>객체에서 스토리지를 덮어씌웁니다.
@@ -148,21 +209,24 @@ namespace SteamB23.Ahheui
         /// <returns>스토리지의 데이터가 담겨있는 <c>StorageBackup</c>객체</returns>
         public StorageBackup Backup()
         {
-            return storage.Backup();
+            lock (runPlatformLock)
+            {
+                return storage.Backup();
+            }
         }
         /// <summary>
         /// 한번만 실행합니다.
         /// </summary>
-        public void OneRun()
+        public void OnceRun()
         {
             isCursorMovePass = false;
             lock (runPlatformLock)
             {
-                if (OneRunning != null)
-                    OneRunning(this, EventArgs.Empty);
+                OnOnceRunning();
                 CommandRun(CurrentSyntax.command);
                 if (!isEnd && !isCursorMovePass)
                     CursorMove(CurrentSyntax.move);
+                OnOnceRan();
             }
         }
         // 스레드에서 돌리기 위한 메서드
@@ -170,10 +234,9 @@ namespace SteamB23.Ahheui
         {
             while (!isEnd && isRun)
             {
-                OneRun();
+                OnceRun();
             }
-            if (Stoping != null)
-                Stoping(this, EventArgs.Empty);
+            OnRepeatRunEndding();
         }
         public void Wait()
         {

@@ -93,8 +93,7 @@ namespace SteamB23.Ahheui
                     break;
                 case Syntax.Command.End:
                     isEnd = true;
-            if (Endding!=null)
-                Endding(this, EventArgs.Empty);
+                    OnFinishing();
                     break;
                 case Syntax.Command.Goto:
                     //                       텍스트 검색을 해야한다.. 미친..
